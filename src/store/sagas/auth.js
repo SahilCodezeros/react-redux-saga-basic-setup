@@ -3,15 +3,23 @@ import { put } from 'redux-saga/effects';
 
 import { proxy } from '../../utils/proxy';
 import * as actions from '../action/index';
-import * as actionTypes from '../action/actionTypes';
 import { getToken, setToken, removeToken } from '../../utils/localStorage';
+
+/*
+    Note: 
+        ---> yield: yield work same as async await, but yield work only in function generator 
+        ---> put: put is one example of what we call an Effect. Effects are plain JavaScript objects 
+                which contain instructions to be fulfilled by the middleware. When a middleware retrieves 
+                an Effect yielded by a Saga, the Saga is paused until the Effect is fulfilled.
+*/
 
 // Auth logout saga function generator
 export function* authLogoutSaga() {
+    // Remove token from localstorage
     yield removeToken();
-    yield put({
-        type: actionTypes.AUTH_LOGOUT
-    });
+
+    // Call logout successed to logout from application
+    yield put(actions.logoutSuccessed());
 };
 
 // Auth login saga function generator
@@ -26,8 +34,6 @@ export function* authLoginSaga(action) {
             email: action.email, 
             password: action.password
         });
-    
-        console.log('from loginAuth', res);
     
         // Set token into localstorage
         setToken(res.data.token);
@@ -57,8 +63,6 @@ export function* authSignupSaga(action) {
             password: action.password 
         });
 
-        console.log('form signupAuth', res);
-
         // Set token into localstorage
         setToken(res.data.token);
 
@@ -86,14 +90,11 @@ export function* authTokenSaga() {
         
         try {
             // Get user data from database using token
-            const res = yield axios.get(`${proxy}https://sahil-task-manager.herokuapp.com/users/me`, 
-            {
+            const res = yield axios.get(`${proxy}https://sahil-task-manager.herokuapp.com/users/me`, {
                 headers: {
                     Authorization: 'Bearer ' + token
                 }
             });
-
-            console.log('from loginAuth', res);
 
             // Call authSuccess to store data in state
             yield put(actions.checkAuthToken(token, res.data));

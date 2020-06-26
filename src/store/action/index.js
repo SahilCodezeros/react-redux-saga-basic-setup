@@ -6,5 +6,6 @@ export {
     authFail,
     loginAuth,
     signupAuth,
-    checkAuthToken
+    checkAuthToken,
+    logoutSuccessed
 } from './auth';
